@@ -1,0 +1,62 @@
+# Use delivery alerts only with an intentionally export-enabled inventory.
+# Declarative only. No journal publisher or runtime activation is installed here.
+groups:
+- name: token-burn-evidence
+  rules:
+  - alert: TokenBurnMissingTerminal
+    expr: token_burn_missing_terminal_owner_dead > 0
+    for: 1m
+    labels:
+      severity: warning
+      component: token-burn
+    annotations:
+      summary: An operation owner is dead without a terminal record.
+  - alert: TokenBurnChildNotReaped
+    expr: token_burn_child_not_reaped > 0
+    for: 1m
+    labels:
+      severity: warning
+      component: token-burn
+    annotations:
+      summary: An operation has no durable child-reaped proof.
+  - alert: TokenBurnRecoveryUnverified
+    expr: token_burn_recovery_unverified > 0
+    for: 1m
+    labels:
+      severity: warning
+      component: token-burn
+    annotations:
+      summary: An operation explicitly recorded unverified recovery.
+  - alert: TokenBurnTelemetryStale
+    expr: token_burn_oldest_pending_age_seconds > 900 and token_burn_pending_signals
+      > 0
+    for: 5m
+    labels:
+      severity: warning
+      component: token-burn
+    annotations:
+      summary: Operation telemetry has awaited acceptance for over 15 minutes.
+  - alert: TokenBurnDeliveryHeld
+    expr: token_burn_held_signals > 0
+    for: 5m
+    labels:
+      severity: warning
+      component: token-burn
+    annotations:
+      summary: Operation telemetry was rejected and needs inspection.
+  - alert: TokenBurnInventoryIncomplete
+    expr: token_burn_scan_complete == 0
+    for: 2m
+    labels:
+      severity: warning
+      component: token-burn
+    annotations:
+      summary: The bounded operation inventory is incomplete or unreadable.
+  - alert: TokenBurnMonitorStale
+    expr: time() - token_burn_snapshot_timestamp_seconds > 300 or absent(token_burn_snapshot_timestamp_seconds)
+    for: 2m
+    labels:
+      severity: warning
+      component: token-burn
+    annotations:
+      summary: Operation monitoring has no fresh journal snapshot.

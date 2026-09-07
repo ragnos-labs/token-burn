@@ -1,0 +1,51 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "token-burn"
+version = "0.1.0"
+description = "Keep complete agent evidence, return bounded summaries, and recover Git work safely."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{name = "RAGnos Labs"}]
+dependencies = []
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Operating System :: POSIX",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Software Development :: Quality Assurance",
+]
+
+[project.urls]
+Homepage = "https://github.com/ragnos-labs/token-burn"
+Repository = "https://github.com/ragnos-labs/token-burn"
+Issues = "https://github.com/ragnos-labs/token-burn/issues"
+
+[project.scripts]
+token-burn = "token_burn.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "ruff>=0.12,<1", "build>=1.2,<2"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/token_burn"]
+
+[tool.hatch.build.targets.sdist]
+include = ["/src", "/tests", "/docs", "/examples", "/scripts", "/README.md", "/LICENSE", "/NOTICE", "/SECURITY.md", "/CONTRIBUTING.md", "/CHANGELOG.md", "/pyproject.toml", "/uv.lock"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
