@@ -115,7 +115,7 @@ both primary counters starts a new counter segment; a decrease in only one is
 ambiguous and makes coverage unavailable instead of replaying the session total.
 These measures are not dollar costs or a universal provider-quota formula.
 
-`token_burn.usage.v1` records include `parser_version=1`,
+`token_burn.usage.v1` records include `parser_version=2`,
 `metric_version=processed_tokens.v1`, variant, `manifest_sha256`, `roster_sha256`,
 task observations, bounded source diagnostics, totals, coverage, and cache counts.
 The manifest digest binds the complete explicit private input. The roster digest
@@ -255,7 +255,7 @@ select an inclusive preference and exclude the LF without copying the size loop.
 
 `token-burn profile show` reads the packaged Markdown without installing it.
 `--json` and Python `profile.show()` return `token_burn.profile.v1` with
-profile_id=coding-efficiency, profile_version/runtime_version=0.0.11, the exact
+profile_id=coding-efficiency, profile_version=0.0.11, runtime_version=0.0.12, the exact
 document, and document_sha256 over its UTF-8 bytes. The resource is at most 4 KiB.
 It points to existing skill discovery and never creates another skill registry.
 
@@ -274,3 +274,17 @@ runtime, add account discovery, or turn advisory measurements into admission rul
 Package release, installed import provenance, observed profile loading, exercised
 runtime, and matched-workflow acceptance are separate pieces of evidence. Default
 adoption remains held until the required native benchmark passes.
+
+## Native model identity compatibility
+
+Parser version 2 preserves native model identifiers with an optional positive
+numeric context-window suffix, such as `claude-opus-5[1m]`. The suffix is part
+of the exact identity: that model does not match `claude-opus-5`. This grammar
+applies only to model fields; task, source, account, and evidence labels retain
+their existing constraints. Malformed or explicitly null native identities are
+unavailable, rather than silently falling back to a declared model.
+
+The parser version changes cache identity. Recollect existing raw sources to
+produce version-2 reports before comparison; version-1 reports cannot be mixed
+with version-2 reports. No raw source rewriting or model-name normalization is
+required. The coding profile document and its version remain unchanged.

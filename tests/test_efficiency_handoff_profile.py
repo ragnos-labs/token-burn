@@ -100,7 +100,8 @@ def test_seal_retains_legacy_envelope_and_excludes_newline_when_requested():
 
 def test_released_profile_is_bounded_and_digest_binds_exact_resource():
     record = profile.show()
-    assert record["profile_version"] == record["runtime_version"] == "0.0.11"
+    assert record["profile_version"] == "0.0.11"
+    assert record["runtime_version"] == "0.0.12"
     assert record["profile_id"] == "coding-efficiency"
     assert len(record["document"].encode()) <= 4096
     assert hashlib.sha256(record["document"].encode()).hexdigest() == record["document_sha256"]

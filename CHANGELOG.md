@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.12
+
+- Preserve native context-window model identifiers such as `claude-opus-5[1m]`
+  through explicit collection, cache reuse, and outcome comparison.
+- Reject malformed explicit native model identities as unavailable. Keep all
+  non-model label contracts unchanged.
+- Advance the usage parser to version 2. Recollect raw sources before comparing
+  older reports; previous parser caches are invalidated automatically.
+- Keep the 0.0.11 coding profile document and working behavior unchanged. Native
+  paired savings remain unqualified; this is a parser compatibility correction.
+
 ## 0.0.11
 
 - Explicit native Codex/Claude usage sources, bounded private cache, whole-task

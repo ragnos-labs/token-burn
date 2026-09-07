@@ -16,6 +16,7 @@ from token_burn.usage import (
     _hex,
     _integer,
     _label,
+    _model,
     _repository,
 )
 
@@ -103,11 +104,12 @@ def _report(value: Any, variant: str) -> dict[str, dict[str, Any]]:
         if (
             not isinstance(task, dict)
             or not TASK_FIELDS <= set(task)
+            or not _model(task.get("model"))
             or not _label(task.get("task_id"))
             or task["task_id"] in result
             or not _repository(task["repository_id"])
             or task["client"] not in {"codex", "claude_code"}
-            or any(not _label(task[k]) for k in ("model", "reasoning_effort", "archetype"))
+            or any(not _label(task[k]) for k in ("reasoning_effort", "archetype"))
             or type(task["round"]) is not int
             or task["round"] < 1
             or not _hex(task["revision"], (40, 64))
@@ -115,7 +117,7 @@ def _report(value: Any, variant: str) -> dict[str, dict[str, Any]]:
             or type(task["sources_complete"]) is not bool
             or not isinstance(task.get("observed_models"), list)
             or len(task["observed_models"]) > 32
-            or any(not _label(model) for model in task["observed_models"])
+            or any(not _model(model) for model in task["observed_models"])
             or task.get("model_evidence") not in {"native", "declared"}
         ):
             raise ContractError("invalid_usage_task")

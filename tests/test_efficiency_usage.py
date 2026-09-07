@@ -547,3 +547,69 @@ def test_partial_semantic_aggregate_replay_is_also_unavailable(tmp_path):
     )
     assert report["totals"] is None
     assert "duplicate_native_source" in report["coverage"]["reasons"]
+
+
+@pytest.mark.parametrize("format_", ["claude_print_json", "claude_transcript_jsonl"])
+def test_native_context_window_model_identity_is_preserved(tmp_path, format_):
+    model = "claude-opus-5[1m]"
+    native_usage = {
+        "input_tokens": 10,
+        "cache_creation_input_tokens": 20,
+        "cache_read_input_tokens": 30,
+        "output_tokens": 8,
+    }
+    row = (
+        {
+            "type": "result",
+            "is_error": False,
+            "session_id": "model-session",
+            "usage": native_usage,
+            "modelUsage": {model: {}},
+        }
+        if format_ == "claude_print_json"
+        else {
+            "type": "assistant",
+            "sessionId": "model-session",
+            "message": {
+                "role": "assistant",
+                "id": "model-message",
+                "model": model,
+                "usage": native_usage,
+            },
+        }
+    )
+    path = tmp_path / "native.json"
+    path.write_text(json.dumps(row) + "\n")
+    contract = task(client="claude_code")
+    contract["model"] = model
+    selected = manifest([contract], [source(path, format_=format_)])
+    cold = usage.collect(selected, state_dir=tmp_path / "state")
+    warm = usage.collect(selected, state_dir=tmp_path / "state")
+    for report in (cold, warm):
+        assert report["coverage"]["status"] == "measured"
+        assert report["totals"]["processed_tokens"] == 68
+        assert report["tasks"][0]["observed_models"] == [model]
+    contract["model"] = "claude-opus-5"
+    mismatch = usage.collect(selected, state_dir=tmp_path / "other-state")
+    assert mismatch["coverage"]["status"] == "unavailable"
+    assert "native_model_mismatch" in mismatch["tasks"][0]["coverage"]["reasons"]
+
+
+@pytest.mark.parametrize(
+    "model",
+    [
+        "model[]",
+        "model[1m",
+        "model1m]",
+        "model[1m][1m]",
+        "model[0m]",
+        "model[1m]\n",
+        "model[../x]",
+        "a" * 161,
+    ],
+)
+def test_malformed_model_qualifiers_are_rejected(model):
+    contract = task()
+    contract["model"] = model
+    with pytest.raises(ContractError):
+        usage.validate_manifest(manifest([contract], []))
