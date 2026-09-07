@@ -11,7 +11,7 @@ when it is available. Do not post credentials, private archives, raw journals,
 or exploitable details in a public issue. If private reporting is unavailable,
 open an issue requesting a private reporting channel without disclosing details.
 
-The current 0.1 alpha is the supported release line. Safety and data-loss reports
+The current 0.0.10 alpha is the supported release line. Safety and data-loss reports
 should include a minimal synthetic reproduction, platform and Git/Python versions.
 
 ## Trust boundaries

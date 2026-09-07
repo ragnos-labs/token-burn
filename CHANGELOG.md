@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0
+## 0.0.10
 
 - Standalone command and case evidence capture with bounded JSON summaries and byte reads.
 - Durable private operation journals, cancellation receipts, integrity checks and explicit replay.

@@ -4,4 +4,4 @@ Import submodules explicitly. Importing token_burn never starts an operation,
 opens a journal, or initializes telemetry.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.0.10"
