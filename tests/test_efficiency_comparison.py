@@ -219,3 +219,16 @@ def test_observed_model_changes_cannot_hide_behind_unchanged_manifest_model():
     result = usage.compare(baseline, candidate, outcomes)
     assert result["status"] == "unavailable"
     assert "native_model_evidence_mismatch" in result["coverage"]["reasons"]
+
+
+def test_context_window_model_is_compared_without_normalization():
+    baseline, candidate, outcomes = comparison_inputs()
+    for report in (baseline, candidate):
+        for item in report["tasks"]:
+            item["model"] = "claude-opus-5[1m]"
+            item["observed_models"] = [item["model"]]
+            item["model_evidence"] = "native"
+        refresh_roster(report)
+    assert usage.compare(baseline, candidate, outcomes)["accepted"] is True
+    candidate["tasks"][0]["observed_models"] = ["claude-opus-5"]
+    assert usage.compare(baseline, candidate, outcomes)["accepted"] is False

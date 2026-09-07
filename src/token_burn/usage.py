@@ -13,7 +13,7 @@ from typing import Any, Mapping
 from token_burn._local import ContractError, digest, encoded, read_json, state_lock, write_json
 
 SCHEMA_VERSION = "token_burn.usage.v1"
-PARSER_VERSION = "1"
+PARSER_VERSION = "2"
 METRIC_VERSION = "processed_tokens.v1"
 MAX_SOURCE_BYTES = 64 * 1024 * 1024
 MAX_COLLECTION_BYTES = 256 * 1024 * 1024
@@ -51,11 +51,16 @@ FORMATS = {
     "claude_transcript_jsonl": "claude_code",
 }
 _LABEL = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:+-]{0,159}$")
+_MODEL = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:+-]*(?:\[[1-9][0-9]*[km]\])?")
 _REPOSITORY = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:-]*(?:/[A-Za-z0-9][A-Za-z0-9_.:-]*)?$")
 
 
 def _label(value: Any) -> bool:
     return isinstance(value, str) and _LABEL.fullmatch(value) is not None
+
+
+def _model(value: Any) -> bool:
+    return isinstance(value, str) and len(value) <= 160 and _MODEL.fullmatch(value) is not None
 
 
 def _repository(value: Any) -> bool:
@@ -88,9 +93,8 @@ def validate_manifest(value: Mapping[str, Any]) -> dict[str, Any]:
         if (
             not isinstance(task, dict)
             or set(task) != TASK_FIELDS
-            or any(
-                not _label(task[k]) for k in ("task_id", "model", "reasoning_effort", "archetype")
-            )
+            or any(not _label(task[k]) for k in ("task_id", "reasoning_effort", "archetype"))
+            or not _model(task["model"])
             or not _repository(task["repository_id"])
             or task["client"] not in {"codex", "claude_code"}
             or type(task["round"]) is not int
@@ -314,7 +318,9 @@ def _parse(path: Path, source: Mapping[str, Any]) -> dict[str, Any]:
                     )
                     source_meta = payload.get("source")
                     forked = forked or isinstance(source_meta, dict) and "subagent" in source_meta
-                elif row.get("type") == "turn_context" and _label(payload.get("model")):
+                elif row.get("type") == "turn_context" and "model" in payload:
+                    if not _model(payload["model"]):
+                        raise ContractError("native_model_invalid")
                     models.add(payload["model"])
                 elif row.get("type") == "event_msg" and payload.get("type") == "token_count":
                     info = payload.get("info") if isinstance(payload.get("info"), dict) else {}
@@ -367,7 +373,9 @@ def _parse(path: Path, source: Mapping[str, Any]) -> dict[str, Any]:
                     continue
                 usage = _claude(message["usage"])
                 message_id = _identity(message.get("id"), account)
-                if _label(message.get("model")):
+                if "model" in message:
+                    if not _model(message["model"]):
+                        raise ContractError("native_model_invalid")
                     models.add(message["model"])
                 events.append(
                     {
@@ -385,7 +393,7 @@ def _parse(path: Path, source: Mapping[str, Any]) -> dict[str, Any]:
                 if (
                     not isinstance(model_usage, dict)
                     or not model_usage
-                    or any(not _label(model) for model in model_usage)
+                    or any(not _model(model) for model in model_usage)
                     or usage["processed_tokens"] <= 0
                 ):
                     raise ContractError("native_model_usage_unavailable")
