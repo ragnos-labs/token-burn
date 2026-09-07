@@ -9,9 +9,9 @@ the full evidence on your machine and returns the useful facts first.
 It works with any agent, script, or developer that can run a command. No RAGnos account,
 cloud service, model API, or monitoring stack is required. Network export is **off by default**.
 
-> **Status: 0.0.10 alpha.** Local command capture, operation history, and explicit Git
-> worktree recovery are implemented. This is a local toolkit, not a hosted service or
-> an automatically installed agent integration.
+> **Status: 0.0.11 alpha.** Local evidence, operation history, explicit Git recovery,
+> native usage comparison, bounded handoffs, and a released coding profile are
+> implemented. Native workflow adoption and token savings require separate evidence.
 
 - [Try it](#try-it)
 - [How it works](#how-it-works)
@@ -19,6 +19,7 @@ cloud service, model API, or monitoring stack is required. Network export is **o
 - [Recover work before cleanup](#recover-work-before-cleanup)
 - [Optional observability](#optional-observability)
 - [Use it in your own tools](#use-it-in-your-own-tools)
+- [Measure complete tasks](#measure-complete-tasks)
 - [Limits and privacy](#limits-and-privacy)
 
 ## Try it
@@ -29,7 +30,7 @@ commands and for installation directly from this repository.
 ```bash
 python3 -m venv .venv
 . .venv/bin/activate
-python -m pip install "git+https://github.com/ragnos-labs/token-burn.git@v0.0.10"
+python -m pip install "git+https://github.com/ragnos-labs/token-burn.git@v0.0.11"
 
 # Keep the output directory outside your repository.
 DEMO_ROOT=$(mktemp -d)
@@ -92,6 +93,67 @@ separately from the operation's result.
 | Git recovery | Saves Git history, staged changes and working file bytes | Restore work into a fresh independent repository |
 | Removal guards | Recheck owner, target, contents, recovery and process activity | Changed or uncertain state preserves the worktree |
 | Optional telemetry | Exports fixed metadata through a local OTLP collector | Connect operations to your existing observability stack |
+| Native usage | Counts explicitly selected Codex or Claude usage, including retries | Compare whole tasks without dropping failures or treating missing usage as zero |
+| Bounded handoffs | Preserves protected task state and evidence references | Resume from a small validated packet |
+| Released coding profile | Provides a short resource with a version and digest | Use the same working habits through a released pin |
+
+## Measure complete tasks
+
+```bash
+token-burn usage collect --sources sources.json --state-dir /private/usage-state --output usage.json
+token-burn usage compare --baseline baseline.json --candidate candidate.json \
+  --outcomes outcomes.json --output comparison.json
+token-burn handoff create --input task-state.json --output handoff.json
+token-burn handoff validate handoff.json
+token-burn profile show --json
+```
+
+Supply an explicit task roster and native source files. Freeze the task, model,
+reasoning, validation, and repository revision across baseline and candidate.
+Keep retries, children, continuations, and failed attempts in their original task.
+Comparison requires complete usage and the same accepted quality, with repeatable
+improvement in every declared client/repository group. It never pools different
+clients' tokenizers into a single savings ratio or installs the profile for you.
+
+```mermaid
+flowchart LR
+    subgraph Public["Public token-burn release"]
+        P["Pinned package and coding profile"]
+        T["Capture, pages, and protected handoffs"]
+        U["Usage collection and comparison"]
+    end
+    subgraph Private["Private adopter, its authority and evidence"]
+        A["Artifact/profile pins, paths, and pilot selection"]
+        N["Native Codex or Claude sessions"]
+        S["Explicit usage sources and complete task roster"]
+        Q["Fixed quality evidence"]
+        R["Matched results in every group and round"]
+        H["Default and fleet adoption held"]
+        G["Owner decides adoption after measured acceptance"]
+    end
+    P --> A
+    A --> N
+    N --> T
+    N --> S
+    S --> U
+    Q --> U
+    U --> R
+    R -->|"Incomplete or no repeatable savings"| H
+    R -->|"Complete savings at the same quality"| G
+```
+
+**Measured results:** Native paired savings are currently unavailable. No default
+or fleet adoption has been accepted. Source tests and synthetic fixtures do not
+establish those outcomes.
+
+See [the exact schemas, privacy limits, and Python interfaces](docs/efficiency.md).
+The offline [synthetic example](examples/efficiency_demo.py) exercises the flow
+without a model account. Its generated comparison is a fixture, not token-savings
+evidence. Run it with a new output directory:
+
+```bash
+python examples/efficiency_demo.py --output-dir /private/synthetic-efficiency-demo
+```
 
 ```bash
 token-burn --help
@@ -101,10 +163,10 @@ token-burn snapshot
 ```
 
 The evidence-summary budget defaults to **6,000 serialized bytes**, adjustable with
-`--summary-bytes`. Full output remains in the evidence files. That can reduce the
-amount of tool output an agent reads, but **token-burn does not measure model tokens
-or claim a proven percentage of cost savings**. Measure total workflow usage,
-retries, time, and outcome quality for your own agent.
+`--summary-bytes`. Full output remains in the evidence files. A smaller capture
+summary can reduce tool output read by an agent; that fact alone does not establish
+whole-task token or cost savings. Use native usage collection and fixed-quality
+matched comparisons to measure total work, including retries and continuations.
 
 ## Recover work before cleanup
 

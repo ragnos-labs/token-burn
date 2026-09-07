@@ -1,5 +1,10 @@
 # Integration contracts
 
+The additive [local efficiency contracts](efficiency.md) define explicit native
+usage, complete-task comparison, protected handoffs, and the released profile.
+Internal adopters should pin the released package and digest, keeping only their
+owner-specific configuration and compatibility mappings outside it.
+
 ## Capture and inspect
 
 ```python

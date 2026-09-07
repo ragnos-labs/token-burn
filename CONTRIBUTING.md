@@ -32,5 +32,14 @@ Open a pull request with the problem, resulting behavior, validation and relevan
 limitations. Source and release validation can run locally; no paid hosted CI is
 required. Changes to defaults, privacy or removal authority need explicit review.
 
+Efficiency contributions should start from [the public contracts](docs/efficiency.md).
+Add synthetic native-format fixtures and negative controls for missing usage,
+counter resets, inherited history, duplicate events, source changes, and rejected
+quality. Preserve the whole task roster and all attempts. Cache changes need a
+competing collector and cold/warm equality; profile changes need a bounded exact
+resource digest. Keep private account discovery, schedules, policy, and deployment
+configuration in the adopter. A released package pin is the shared implementation;
+do not maintain a separate internal copy of portable behavior.
+
 Contributions are accepted under this repository's Apache-2.0 license. Only submit
 material you have the right to contribute, and preserve required third-party notices.
