@@ -25,6 +25,13 @@ Operation history:
 Git recovery:
   worktree --help                           Archive, restore and guard worktree removal
 
+Local efficiency:
+  usage collect --sources JSON --state-dir DIR --output JSON
+  usage compare --baseline JSON --candidate JSON --outcomes JSON --output JSON
+  handoff create --input JSON --output JSON  Preserve bounded protected task state
+  handoff validate JSON                     Validate a local handoff without executing it
+  profile show [--json]                      Read the released coding profile
+
 Network export is off by default. Run a command with --help for its options.
 Documentation: https://github.com/ragnos-labs/token-burn
 """
@@ -55,5 +62,9 @@ def main(argv: list[str] | None = None) -> int:
         from token_burn.worktree.cli import main as worktree_main
 
         return worktree_main(args[1:])
+    if args[0] in {"usage", "handoff", "profile"}:
+        from token_burn.efficiency_cli import main as efficiency_main
+
+        return efficiency_main(args)
     print('{"status":"error","error_type":"InvalidCommand"}', file=sys.stderr)
     return 2

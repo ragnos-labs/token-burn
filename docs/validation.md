@@ -16,6 +16,10 @@ The test suite includes:
 - Clean-looking files whose on-disk modes or line endings differ from Git's stored content.
 - Active/malformed/new-owner leases, lock replacement, released/reused permits,
   concurrent consumers, active nested process directories and tampered archives.
+- Native usage normalization, fork baselines, duplicate/missing sources, incomplete
+  authentication, bounded warm cache reuse, and competing collector ownership.
+- Full matched task matrices, unchanged validation/model settings, retained failures,
+  protected handoff bounds, legacy envelope sealing, and profile-resource digests.
 
 No test is permitted to act on a real user's worktree or journal. Files, process
 fixtures, ownership records and HTTP endpoints are temporary and synthetic.
@@ -35,6 +39,14 @@ README capture/read example, inspect the resulting operation, and exercise
 archive/remove/restore on a disposable repository. Confirm that imports resolve
 from the installed package and no private source tree or ambient `PYTHONPATH` is
 required. Test the minimum supported Python version as well as a current version.
+
+Also run the offline `examples/efficiency_demo.py` from the installed package
+environment and inspect its usage/comparison/handoff/profile artifacts. Its native
+rows and outcome assertions are synthetic; it proves the integration contract,
+not real client authentication, observed profile loading, or model-token savings.
+Real adoption requires a separately registered native matched-task benchmark with
+complete attribution, all quality gates fixed, and improvement in every group in
+both counterbalanced rounds. Keep release and runtime acceptance receipts separate.
 
 Before publication, inspect the source/wheel inventories, check licenses and
 third-party notices, scan the actual release contents for secrets, and bind the
