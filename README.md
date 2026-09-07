@@ -9,7 +9,7 @@ the full evidence on your machine and returns the useful facts first.
 It works with any agent, script, or developer that can run a command. No RAGnos account,
 cloud service, model API, or monitoring stack is required. Network export is **off by default**.
 
-> **Status: 0.1 alpha.** Local command capture, operation history, and explicit Git
+> **Status: 0.0.10 alpha.** Local command capture, operation history, and explicit Git
 > worktree recovery are implemented. This is a local toolkit, not a hosted service or
 > an automatically installed agent integration.
 
@@ -29,7 +29,7 @@ commands and for installation directly from this repository.
 ```bash
 python3 -m venv .venv
 . .venv/bin/activate
-python -m pip install "git+https://github.com/ragnos-labs/token-burn.git@v0.1.0"
+python -m pip install "git+https://github.com/ragnos-labs/token-burn.git@v0.0.10"
 
 # Keep the output directory outside your repository.
 DEMO_ROOT=$(mktemp -d)
